@@ -1,12 +1,16 @@
-import subprocess
 import time
 import board
 import adafruit_hcsr04
-import paho.mqtt.client as mqtt
-import os
+sonar = adafruit_hcsr04.HCSR04(trigger_pin=board.D5, echo_pin=board.D6)
 
 while True:
-    subprocess.run(["raspistill", "-o", "image.jpg"])
-    subprocess.run(["convert", "-pointsize", "36", "-fill", "white", "-draw", "\"text 225,50 '`date`'\"", "image.jpg", "image2.jpg"])
-    os.remove("image.jpg")
-    os.remove("image2.jpg")
+    try:
+        if sonar.distance >= 80:
+            print(f'Garage door is OPEN. Distance is {sonar.distance}')
+        elif sonar.distance < 80:
+            print(f'Garage door is CLOSED. Distance is {sonar.distance}')
+        else:
+            print('Something\'s bugged.')
+    except RuntimeError:
+        print("Retrying!")
+    time.sleep(2)
