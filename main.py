@@ -4,6 +4,7 @@ import adafruit_hcsr04
 import paho.mqtt.client as mqtt
 import socket
 import json
+from datetime import datetime
 
 def read_distance(sonar):
     return round(sonar.distance, 2)
@@ -43,6 +44,7 @@ while True:
     sensor_payload = json.dumps({
         "state": open_or_closed(sonar),
         "distance": read_distance(sonar),
+        "last_read": datetime.now().strftime("%a %B %d %H:%M"),
     })
     print(f"Publishing sensor is {sensor_online} to {status_topic}")
     client.publish(status_topic, sensor_online, qos=1, retain=True)
@@ -51,6 +53,6 @@ while True:
     print(f'pub_topic: {sens_topic}')
     client.publish(sens_topic, sensor_payload, qos=1, retain=True)
 
-    time.sleep(10)
+    time.sleep(300)
 
 #client.disconnect()
